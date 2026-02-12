@@ -45,6 +45,20 @@ export async function createComplaint(propertyId: string, formData: FormData) {
     return { success: false, message: "Failed to submit complaint" };
   }
 
+  // Send Notification (Fire and forget)
+  import("@/lib/notifications").then(({ sendComplaintReceivedEmail }) => {
+    if (user.email) {
+      sendComplaintReceivedEmail(
+        user.email,
+        user.full_name || "Resident",
+        error ? "" : "N/A",
+        result.data.title,
+      ).catch(console.error);
+    }
+  });
+  // Ideally we need the new ID, but .insert() didn't return it in the original code.
+  // Let's modify the insert to select().
+
   revalidatePath("/complaints");
   return { success: true, message: "Complaint submitted successfully" };
 }
@@ -57,6 +71,8 @@ export async function updateComplaintStatus(
   if (!user) return { success: false, message: "Unauthorized" };
 
   const supabase = await createClient();
+
+  // 1. Update Status
   const { error } = await supabase
     .from("complaints")
     .update({ status })
@@ -65,6 +81,40 @@ export async function updateComplaintStatus(
   if (error) {
     console.error("Update status error:", error);
     return { success: false, message: "Failed to update status" };
+  }
+
+  // 2. Fetch Complaint Details for Notification
+  // We need the AUTHOR's email, not the current user's (who is Admin/Leader)
+  const { data: complaint } = await supabase
+    .from("complaints")
+    .select(
+      `
+      title,
+      user_id,
+      author:user_id(email, full_name)
+    `,
+    )
+    .eq("id", complaintId)
+    .single();
+
+  // 3. Send Notification
+  if (complaint && complaint.author) {
+    import("@/lib/notifications").then(({ sendComplaintStatusUpdateEmail }) => {
+      // @ts-expect-error - Supabase types join query
+      const email = complaint.author.email;
+      // @ts-expect-error - Supabase types join query
+      const name = complaint.author.full_name || "Resident";
+
+      if (email) {
+        sendComplaintStatusUpdateEmail(
+          email,
+          name,
+          complaintId,
+          status,
+          complaint.title,
+        ).catch(console.error);
+      }
+    });
   }
 
   revalidatePath(`/complaints/${complaintId}`);

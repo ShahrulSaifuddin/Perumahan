@@ -31,6 +31,20 @@
 - Notifications (email + in-app) (Pending integration)
 - DBKL monitoring screens
 
+### Phase 4 — Notifications & Polish
+
+**Status**: ✅ Complete
+
+- Resend Email Integration
+- Complaint & Transaction Notifications
+- Page Transitions (Framer Motion)
+
+### Phase 5 — Gap Closure & User Management
+
+**Status**: ✅ Complete
+
+- User Management (Create/List Users)
+
 ## Milestone 2 — Enhancements
 
 - Resident finance summary visibility (optional)

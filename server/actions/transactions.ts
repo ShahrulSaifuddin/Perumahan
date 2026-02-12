@@ -118,6 +118,7 @@ export async function approveTransaction(transactionId: string) {
   // For now assuming RLS handles visibility, but action logic should double check if strict.
   // We trust getCurrentUserProfile which gets profile from DB.
 
+  // 1. Approve
   const supabase = await createClient();
   const { error } = await supabase
     .from("transactions")
@@ -129,6 +130,40 @@ export async function approveTransaction(transactionId: string) {
     .eq("status", "SUBMITTED"); // Must be SUBMITTED
 
   if (error) return { success: false, message: "Approval failed" };
+
+  // 2. Fetch details for notification
+  const { data: tx } = await supabase
+    .from("transactions")
+    .select(
+      `
+      amount, type,
+      creator:created_by(email, full_name)
+    `,
+    )
+    .eq("id", transactionId)
+    .single();
+
+  // 3. Send Notification
+  if (tx && tx.creator) {
+    import("@/lib/notifications").then(
+      ({ sendTransactionStatusUpdateEmail }) => {
+        // @ts-expect-error
+        const email = tx.creator.email;
+        // @ts-expect-error
+        const name = tx.creator.full_name || "Officer";
+
+        if (email) {
+          sendTransactionStatusUpdateEmail(
+            email,
+            name,
+            tx.type,
+            "APPROVED",
+            tx.amount,
+          ).catch(console.error);
+        }
+      },
+    );
+  }
 
   revalidatePath("/finance");
   return { success: true, message: "Transaction Approved" };
@@ -153,6 +188,40 @@ export async function rejectTransaction(transactionId: string) {
     .eq("status", "SUBMITTED");
 
   if (error) return { success: false, message: "Rejection failed" };
+
+  // 2. Fetch details for notification
+  const { data: tx } = await supabase
+    .from("transactions")
+    .select(
+      `
+      amount, type,
+      creator:created_by(email, full_name)
+    `,
+    )
+    .eq("id", transactionId)
+    .single();
+
+  // 3. Send Notification
+  if (tx && tx.creator) {
+    import("@/lib/notifications").then(
+      ({ sendTransactionStatusUpdateEmail }) => {
+        // @ts-expect-error
+        const email = tx.creator.email;
+        // @ts-expect-error
+        const name = tx.creator.full_name || "Officer";
+
+        if (email) {
+          sendTransactionStatusUpdateEmail(
+            email,
+            name,
+            tx.type,
+            "REJECTED",
+            tx.amount,
+          ).catch(console.error);
+        }
+      },
+    );
+  }
 
   revalidatePath("/finance");
   return { success: true, message: "Transaction Rejected" };
