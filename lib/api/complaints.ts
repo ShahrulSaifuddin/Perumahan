@@ -14,6 +14,7 @@ export interface Complaint {
     full_name: string;
     email: string;
   };
+  sla_due_at?: string;
 }
 
 export interface Comment {

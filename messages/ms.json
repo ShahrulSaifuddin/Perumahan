@@ -1,0 +1,15 @@
+{
+  "Sidebar": {
+    "dashboard": "Papan Utama",
+    "complaints": "Aduan",
+    "finance": "Kewangan",
+    "users": "Pengguna",
+    "logout": "Log Keluar"
+  },
+  "Dashboard": {
+    "welcome": "Selamat Kembali",
+    "stats": "Statistik",
+    "complaints_trend": "Trend Aduan",
+    "budget_utilization": "Penggunaan Bajet"
+  }
+}

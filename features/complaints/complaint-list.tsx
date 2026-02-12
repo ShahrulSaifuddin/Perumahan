@@ -3,6 +3,7 @@
 import { format } from "date-fns";
 import Link from "next/link";
 import { StatusBadge } from "./status-badge";
+import { SLABadge } from "./sla-badge";
 import { Complaint } from "@/lib/api/complaints";
 
 interface ComplaintListProps {
@@ -39,10 +40,15 @@ export function ComplaintList({ complaints }: ComplaintListProps) {
           <p className="text-sm text-muted-foreground line-clamp-2">
             {complaint.description}
           </p>
-          <div className="mt-3 flex gap-2">
+          <div className="mt-3 flex gap-2 items-center">
             <span className="text-xs px-2 py-1 bg-secondary rounded text-secondary-foreground">
               {complaint.category}
             </span>
+            {complaint.sla_due_at &&
+              complaint.status !== "RESOLVED" &&
+              complaint.status !== "CLOSED" && (
+                <SLABadge dueAt={complaint.sla_due_at} />
+              )}
           </div>
         </Link>
       ))}

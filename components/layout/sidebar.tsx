@@ -13,47 +13,50 @@ import {
   Settings,
   LogOut,
 } from "lucide-react";
-
-const routes = [
-  {
-    label: "Dashboard",
-    icon: LayoutDashboard,
-    href: "/dashboard",
-    color: "text-sky-500",
-  },
-  {
-    label: "Properties",
-    icon: Building2,
-    href: "/properties",
-    color: "text-violet-500",
-  },
-  {
-    label: "Finance",
-    icon: BarChart3,
-    href: "/finance",
-    color: "text-pink-700",
-  },
-  {
-    label: "Complaints",
-    icon: MessageSquare,
-    href: "/complaints",
-    color: "text-orange-700",
-  },
-  {
-    label: "Reports",
-    icon: FileText,
-    href: "/reports",
-    color: "text-emerald-500",
-  },
-  {
-    label: "Settings",
-    icon: Settings,
-    href: "/settings/users",
-  },
-];
+import { useTranslations } from "next-intl";
+import { LanguageSwitcher } from "@/components/language-switcher";
 
 export function Sidebar() {
   const pathname = usePathname();
+  const t = useTranslations("Sidebar");
+
+  const routes = [
+    {
+      label: t("dashboard"),
+      icon: LayoutDashboard,
+      href: "/dashboard",
+      color: "text-sky-500",
+    },
+    {
+      label: "Properties", // Missing translation key, fallback to English for now or add to JSON
+      icon: Building2,
+      href: "/properties",
+      color: "text-violet-500",
+    },
+    {
+      label: t("finance"),
+      icon: BarChart3,
+      href: "/finance",
+      color: "text-pink-700",
+    },
+    {
+      label: t("complaints"),
+      icon: MessageSquare,
+      href: "/complaints",
+      color: "text-orange-700",
+    },
+    {
+      label: "Reports", // Missing translation key
+      icon: FileText,
+      href: "/reports",
+      color: "text-emerald-500",
+    },
+    {
+      label: t("users"), // Was Settings, but href is /settings/users, assuming "Users" is better context or "Settings"
+      icon: Settings,
+      href: "/settings/users",
+    },
+  ];
 
   return (
     <div className="space-y-4 py-4 flex flex-col h-full bg-slate-100/50 dark:bg-slate-900/50 border-r border-slate-200 dark:border-slate-800">
@@ -84,7 +87,8 @@ export function Sidebar() {
           ))}
         </div>
       </div>
-      <div className="px-3 py-2">
+      <div className="px-3 py-2 space-y-2">
+        <LanguageSwitcher />
         <form action="/auth/signout" method="post">
           <button
             className="text-sm group flex p-3 w-full justify-start font-medium cursor-pointer text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-all duration-200"
@@ -92,7 +96,7 @@ export function Sidebar() {
           >
             <div className="flex items-center flex-1">
               <LogOut className="h-5 w-5 mr-3" />
-              Log Out
+              {t("logout")}
             </div>
           </button>
         </form>

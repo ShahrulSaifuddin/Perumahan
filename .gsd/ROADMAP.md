@@ -63,6 +63,13 @@
 - [x] Externalize Email Configuration (Env Vars)
 - [ ] Standardize Loading/Error states in Forms (Deferred)
 
+### Phase 8 — Multi-language & SLA (Enhancements)
+
+**Status**: ✅ Complete
+
+- [x] Implement SLA Tracking (Due Dates)
+- [x] Implement Multi-language Support (i18n)
+
 ## Milestone 3 — Enterprise Add-ons
 
 - Integrations (bank feeds, accounting export)

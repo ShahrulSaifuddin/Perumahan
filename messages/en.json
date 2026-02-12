@@ -1,0 +1,15 @@
+{
+  "Sidebar": {
+    "dashboard": "Dashboard",
+    "complaints": "Complaints",
+    "finance": "Finance",
+    "users": "Users",
+    "logout": "Log Out"
+  },
+  "Dashboard": {
+    "welcome": "Welcome back",
+    "stats": "Statistics",
+    "complaints_trend": "Complaint Trends",
+    "budget_utilization": "Budget Utilization"
+  }
+}

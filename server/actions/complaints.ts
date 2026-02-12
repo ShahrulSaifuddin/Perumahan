@@ -5,6 +5,16 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { getCurrentUserProfile } from "@/lib/api/users";
 
+// Interface for joined complaint query
+interface ComplaintWithAuthor {
+  title: string;
+  user_id: string;
+  author: {
+    email: string;
+    full_name: string;
+  } | null;
+}
+
 const complaintSchema = z.object({
   title: z.string().min(5, "Title too short"),
   description: z.string().min(10, "Description too short"),
@@ -30,6 +40,10 @@ export async function createComplaint(propertyId: string, formData: FormData) {
     };
   }
 
+  // Calculate SLA: 3 days from now
+  const slaDueAt = new Date();
+  slaDueAt.setDate(slaDueAt.getDate() + 3);
+
   const supabase = await createClient();
   const { error } = await supabase.from("complaints").insert({
     property_id: propertyId,
@@ -38,6 +52,7 @@ export async function createComplaint(propertyId: string, formData: FormData) {
     description: result.data.description,
     category: result.data.category,
     status: "OPEN",
+    sla_due_at: slaDueAt.toISOString(),
   });
 
   if (error) {
@@ -56,8 +71,6 @@ export async function createComplaint(propertyId: string, formData: FormData) {
       ).catch(console.error);
     }
   });
-  // Ideally we need the new ID, but .insert() didn't return it in the original code.
-  // Let's modify the insert to select().
 
   revalidatePath("/complaints");
   return { success: true, message: "Complaint submitted successfully" };
@@ -84,8 +97,7 @@ export async function updateComplaintStatus(
   }
 
   // 2. Fetch Complaint Details for Notification
-  // We need the AUTHOR's email, not the current user's (who is Admin/Leader)
-  const { data: complaint } = await supabase
+  const { data: rawComplaint } = await supabase
     .from("complaints")
     .select(
       `
@@ -97,13 +109,13 @@ export async function updateComplaintStatus(
     .eq("id", complaintId)
     .single();
 
+  const complaint = rawComplaint as unknown as ComplaintWithAuthor;
+
   // 3. Send Notification
   if (complaint && complaint.author) {
     import("@/lib/notifications").then(({ sendComplaintStatusUpdateEmail }) => {
-      // @ts-expect-error - Supabase types join query
-      const email = complaint.author.email;
-      // @ts-expect-error - Supabase types join query
-      const name = complaint.author.full_name || "Resident";
+      const email = complaint.author?.email;
+      const name = complaint.author?.full_name || "Resident";
 
       if (email) {
         sendComplaintStatusUpdateEmail(
