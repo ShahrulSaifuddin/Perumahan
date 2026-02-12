@@ -1,6 +1,6 @@
 ---
 phase: 8
-verified_at: 2026-02-12T17:15:00+08:00
+verified_at: 2026-02-12
 verdict: PASS
 ---
 
@@ -8,30 +8,70 @@ verdict: PASS
 
 ## Summary
 
-SLA Tracking and Multi-language Support implemented and built successfully.
+11/11 must-haves verified.
 
 ## Must-Haves
 
-### ✅ Implement SLA Tracking
+### ✅ SLA Database Column
 
 **Status:** PASS
-**Evidence:**
+**Evidence:** `supabase/migrations/20260212170300_add_sla.sql` exists.
 
-- `server/actions/complaints.ts` updated to set `sla_due_at` (+3 days).
-- `complaints` table schema updated via migration file.
-- `ComplaintList` updated to show "Due in X days" / "Overdue".
-
-### ✅ Implement Multi-language Support
+### ✅ SLA Logic
 
 **Status:** PASS
-**Evidence:**
+**Evidence:** `server/actions/complaints.ts` calculates `slaDueAt` (3 days) on creation.
 
-- `next-intl` installed and configured in `next.config.ts` and `i18n.ts`.
-- `app/layout.tsx` wraps app in `NextIntlClientProvider`.
-- `Sidebar` updated to use translations and includes `LanguageSwitcher`.
-- `messages/en.json` and `messages/ms.json` created.
-- `npm run build` passed.
+### ✅ i18n Configuration
+
+**Status:** PASS
+**Evidence:** `i18n.ts` handles cookie-based locale. `middleware.ts` exists. `next.config.ts` uses `next-intl` plugin.
+
+### ✅ Language Switcher
+
+**Status:** PASS
+**Evidence:** `components/language-switcher.tsx` exists and implements cookie toggling.
+
+### ✅ Public Landing Page
+
+**Status:** PASS
+**Evidence:** `app/page.tsx` exists and redirects authenticated users to `/dashboard`.
+
+### ✅ Protected Dashboard
+
+**Status:** PASS
+**Evidence:** `app/(protected)/dashboard/page.tsx` exists.
+
+### ✅ Sidebar Visibility
+
+**Status:** PASS
+**Evidence:** `app/(protected)/layout.tsx` includes `Sidebar`.
+
+### ✅ Server Actions (Properties)
+
+**Status:** PASS
+**Evidence:** `server/actions/properties.ts` contains `create`, `update`, `delete` with RBAC.
+
+### ✅ Settings Layout
+
+**Status:** PASS
+**Evidence:** `app/(protected)/settings/layout.tsx` includes tabs for "Users" and "Properties".
+
+### ✅ Properties Page
+
+**Status:** PASS
+**Evidence:** `app/(protected)/settings/properties/page.tsx` exists and enforces `DBKL_SUPER_ADMIN` check.
+
+### ✅ RBAC Implementation
+
+**Status:** PASS
+**Evidence:** `checkSuperAdmin` helper used in all property actions and page.
 
 ## Verdict
 
 PASS
+
+## Notes
+
+- i18n uses a custom cookie-based strategy without `[locale]` routing to avoid deep refactoring, as planned.
+- UI components (Shadcn) were manually installed and configured to support Flat Management.

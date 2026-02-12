@@ -69,6 +69,8 @@
 
 - [x] Implement SLA Tracking (Due Dates)
 - [x] Implement Multi-language Support (i18n)
+- [x] Refactor Landing Page & Dashboard
+- [x] Implement Flat Management (Settings)
 
 ## Milestone 3 — Enterprise Add-ons
 

@@ -1,6 +1,7 @@
 import { UserList } from "@/features/users/user-list";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
+import { Separator } from "@/components/ui/separator";
 
 export const dynamic = "force-dynamic";
 
@@ -11,10 +12,6 @@ export default async function UsersPage() {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) redirect("/auth/login");
-
-  // Fetch Users
-  // Profiles are viewable by authenticated users (RLS), but let's see if we need special handling.
-  // Our RLS: "Profiles viewable by everyone" (Authenticated)
 
   const { data: users } = await supabase
     .from("profiles")
@@ -30,16 +27,14 @@ export default async function UsersPage() {
     .order("created_at", { ascending: false });
 
   return (
-    <div className="container mx-auto p-6 max-w-5xl">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">
-          Settings
-        </h1>
-        <p className="text-muted-foreground mt-1">
-          Manage users and permissions
+    <div className="space-y-6">
+      <div>
+        <h3 className="text-lg font-medium">Users</h3>
+        <p className="text-sm text-muted-foreground">
+          Manage user roles and permissions.
         </p>
       </div>
-
+      <Separator />
       <UserList users={users || []} />
     </div>
   );
