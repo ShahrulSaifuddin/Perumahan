@@ -47,8 +47,14 @@
 
 ## Milestone 2 — Enhancements
 
-- Resident finance summary visibility (optional)
-- Advanced reporting (charts, CSV)
+### Phase 6 — Advanced Reporting & Dashboard
+
+**Status**: ✅ Complete
+
+- Real Dashboard Stats (Complaints, Finance)
+- Interactive Charts (Recharts)
+- Resident Finance Summary (Personal View)
+
 - Multi-language
 - SLA tracking for complaints
 - File evidence validation + stronger workflows
