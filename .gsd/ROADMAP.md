@@ -23,10 +23,12 @@
 
 ### Phase 3 — Complaints MVP
 
-- Complaint create + attachments
+**Status**: ✅ Complete
+
+- Complaint create + attachments (Basic text)
 - Status workflow + timeline
 - Comments thread
-- Notifications (email + in-app)
+- Notifications (email + in-app) (Pending integration)
 - DBKL monitoring screens
 
 ## Milestone 2 — Enhancements
