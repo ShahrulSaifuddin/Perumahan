@@ -3,12 +3,20 @@
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 
+import { MobileSidebar } from "@/components/layout/mobile-sidebar";
+
 export function Header() {
   const { theme, setTheme } = useTheme();
 
   return (
     <div className="h-16 w-full flex items-center justify-between px-6 border-b border-slate-200 dark:border-slate-800 bg-white/30 dark:bg-slate-900/30 backdrop-blur-md sticky top-0 z-50">
-      <div className="font-semibold text-lg">DBKL Flat Management</div>
+      <div className="flex items-center gap-x-4">
+        <MobileSidebar />
+        <div className="font-semibold text-lg hidden md:block">
+          DBKL Flat Management
+        </div>
+        <div className="font-semibold text-lg md:hidden">DBKL</div>
+      </div>
       <div className="flex items-center gap-x-4">
         <button
           onClick={() => setTheme(theme === "dark" ? "light" : "dark")}

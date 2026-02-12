@@ -10,7 +10,6 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Edit, Trash2 } from "lucide-react";
-import { useState } from "react";
 import { PropertyUpsertDialog } from "./property-upsert-dialog";
 import { PropertyDeleteDialog } from "./property-delete-dialog";
 
@@ -28,17 +27,12 @@ interface PropertyListProps {
 }
 
 export function PropertyList({ properties, isSuperAdmin }: PropertyListProps) {
-  const [editingProperty, setEditingProperty] = useState<Property | null>(null);
-  const [deletingProperty, setDeletingProperty] = useState<Property | null>(
-    null,
-  );
-
   return (
     <div className="space-y-4">
       <div className="flex justify-end">
         {isSuperAdmin && <PropertyUpsertDialog />}
       </div>
-      <div className="rounded-md border">
+      <div className="rounded-md border overflow-x-auto">
         <Table>
           <TableHeader>
             <TableRow>
