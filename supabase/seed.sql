@@ -1,40 +1,77 @@
+-- 1. Enable pgcrypto (required for password hashing)
+create extension if not exists "pgcrypto";
 
--- Create test property
+-- 2. WIPE EVERYTHING (Fresh Start)
+TRUNCATE TABLE 
+  audit_logs, 
+  complaint_comments, 
+  complaints, 
+  transactions, 
+  finance_allocations, 
+  profiles, 
+  properties
+  CASCADE;
+
+-- 3. Clean up Auth User (Be careful attempting to delete current user if running as that user)
+DELETE FROM auth.users WHERE email = 'admin@dbkl.gov.my';
+
+-- 4. Insert Auth User (Password: admin123456)
+-- We set confirmation_token to '' (empty string) to avoid "Scan error ... converting NULL to string is unsupported"
+INSERT INTO auth.users (
+  instance_id,
+  id,
+  aud,
+  role,
+  email,
+  encrypted_password,
+  email_confirmed_at,
+  confirmation_token,
+  recovery_token,
+  email_change_token_new,
+  email_change,
+  raw_app_meta_data,
+  raw_user_meta_data,
+  created_at,
+  updated_at
+) VALUES (
+  '00000000-0000-0000-0000-000000000000',
+  '11111111-1111-1111-1111-111111111111',
+  'authenticated',
+  'authenticated',
+  'admin@dbkl.gov.my',
+  crypt('admin123456', gen_salt('bf')),
+  now(),
+  '',
+  '',
+  '',
+  '',
+  '{"provider":"email","providers":["email"]}',
+  '{"full_name": "Super Admin"}',
+  now(),
+  now()
+);
+
+-- 5. Insert ONE default property
 INSERT INTO properties (id, name, address)
 VALUES 
   ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'PPR Pantai Ria', 'Jalan Pantai Dalam, 59200 Kuala Lumpur');
 
--- Create test Finance Allocation
+-- 6. Insert Profile linked to user
+INSERT INTO public.profiles (
+  id,
+  email,
+  full_name,
+  role,
+  property_id
+) VALUES (
+  '11111111-1111-1111-1111-111111111111',
+  'admin@dbkl.gov.my',
+  'Super Admin',
+  'DBKL_SUPER_ADMIN',
+  NULL
+);
+
+-- 7. Insert Finance Allocation
 INSERT INTO finance_allocations (property_id, year, amount)
 VALUES
   ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 2026, 5000.00);
-
--- NOTE: Auth users must be created via Supabase Auth API or manually in local bucket.
--- Supabase seed.sql runs directly on Postgres, it CANNOT create auth.users easily without tricky hacking.
--- Instead, we will insert into profiles with specific UUIDs, and we assume these UUIDs will be used when creating users.
-
--- WE WILL USE THESE UUIDs for creating users:
--- Admin: 11111111-1111-1111-1111-111111111111 (admin@dbkl.gov.my)
--- Officer: 22222222-2222-2222-2222-222222222222 (officer@dbkl.gov.my)
--- Leader: 33333333-3333-3333-3333-333333333333 (leader@ppr.com)
--- Finance: 44444444-4444-4444-4444-444444444444 (finance@ppr.com)
--- Resident: 55555555-5555-5555-5555-555555555555 (resident@ppr.com)
-
--- Since we have a trigger to create profiles typically? NO, we didn't create a trigger in 1.2 plan. 
--- We will insert profiles manually here.
-
-INSERT INTO auth.users (id, email, raw_user_meta_data)
-VALUES
- ('11111111-1111-1111-1111-111111111111', 'admin@dbkl.gov.my', '{"full_name": "Super Admin"}'),
- ('22222222-2222-2222-2222-222222222222', 'officer@dbkl.gov.my', '{"full_name": "DBKL Officer"}'),
- ('33333333-3333-3333-3333-333333333333', 'leader@ppr.com', '{"full_name": "Flat Leader"}'),
- ('44444444-4444-4444-4444-444444444444', 'finance@ppr.com', '{"full_name": "Finance Officer"}'),
- ('55555555-5555-5555-5555-555555555555', 'resident@ppr.com', '{"full_name": "Resident Ali"}');
-
-INSERT INTO profiles (id, email, full_name, role, property_id)
-VALUES
-  ('11111111-1111-1111-1111-111111111111', 'admin@dbkl.gov.my', 'Super Admin', 'DBKL_SUPER_ADMIN', NULL),
-  ('22222222-2222-2222-2222-222222222222', 'officer@dbkl.gov.my', 'DBKL Officer', 'DBKL_OFFICER', NULL),
-  ('33333333-3333-3333-3333-333333333333', 'leader@ppr.com', 'Flat Leader', 'FLAT_LEADER', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'),
-  ('44444444-4444-4444-4444-444444444444', 'finance@ppr.com', 'Finance Officer', 'FINANCE_OFFICER', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'),
-  ('55555555-5555-5555-5555-555555555555', 'resident@ppr.com', 'Resident Ali', 'RESIDENT', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11');

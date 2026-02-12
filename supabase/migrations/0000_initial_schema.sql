@@ -1,6 +1,6 @@
 
 -- Enable UUID extension
-create extension if not exists "uuid-ossp";
+-- create extension if not exists "uuid-ossp";
 
 -- Enums
 create type user_role as enum ('DBKL_SUPER_ADMIN', 'DBKL_OFFICER', 'FLAT_LEADER', 'FINANCE_OFFICER', 'RESIDENT');
@@ -12,7 +12,7 @@ create type complaint_status as enum ('OPEN', 'IN_REVIEW', 'ACTIONED', 'RESOLVED
 
 -- 1. Properties
 create table properties (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default gen_random_uuid(),
   name text not null,
   address text,
   created_at timestamptz default now()
@@ -30,7 +30,7 @@ create table profiles (
 
 -- 3. Finance Allocations
 create table finance_allocations (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default gen_random_uuid(),
   property_id uuid references properties(id) not null,
   year int not null,
   amount decimal(12, 2) default 5000.00,
@@ -41,7 +41,7 @@ create table finance_allocations (
 
 -- 4. Transactions
 create table transactions (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default gen_random_uuid(),
   property_id uuid references properties(id) not null,
   type transaction_type not null,
   amount decimal(12, 2) not null,
@@ -57,7 +57,7 @@ create table transactions (
 
 -- 5. Complaints
 create table complaints (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default gen_random_uuid(),
   property_id uuid references properties(id) not null,
   user_id uuid references profiles(id) not null,
   title text not null,
@@ -70,7 +70,7 @@ create table complaints (
 
 -- 6. Complaint Comments
 create table complaint_comments (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default gen_random_uuid(),
   complaint_id uuid references complaints(id) on delete cascade not null,
   user_id uuid references profiles(id) not null,
   comment text not null,
@@ -79,7 +79,7 @@ create table complaint_comments (
 
 -- 7. Audit Logs
 create table audit_logs (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default gen_random_uuid(),
   action text not null,
   entity_type text not null,
   entity_id uuid,
