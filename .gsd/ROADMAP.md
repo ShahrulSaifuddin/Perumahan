@@ -72,6 +72,12 @@
 - [x] Refactor Landing Page & Dashboard
 - [x] Implement Flat Management (Settings)
 
+### Phase 9 — Performance & UX Polish
+
+- [ ] Implement Loading States (Skeletons)
+- [ ] Optimize Data Fetching
+- [ ] Route Prefetching Strategy
+
 ## Milestone 3 — Enterprise Add-ons
 
 - Integrations (bank feeds, accounting export)
