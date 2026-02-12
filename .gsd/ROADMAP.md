@@ -13,6 +13,8 @@
 
 ### Phase 2 — Finance MVP
 
+**Status**: ✅ Complete
+
 - Allocation per property per year (RM 5,000 default)
 - Transactions IN/OUT with statuses
 - Approval flow for OUT
