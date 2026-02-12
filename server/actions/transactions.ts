@@ -5,6 +5,16 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { getCurrentUserProfile } from "@/lib/api/users";
 
+// Define the shape of the transaction join result
+interface TransactionWithCreator {
+  amount: number;
+  type: "IN" | "OUT";
+  created_by: {
+    email: string;
+    full_name: string;
+  } | null;
+}
+
 const transactionSchema = z.object({
   type: z.enum(["IN", "OUT"]),
   amount: z.coerce.number().positive(),
@@ -132,25 +142,28 @@ export async function approveTransaction(transactionId: string) {
   if (error) return { success: false, message: "Approval failed" };
 
   // 2. Fetch details for notification
-  const { data: tx } = await supabase
+  // We cast the result to unknown first, then to our interface to satisfy TS
+  const { data: rawTx } = await supabase
     .from("transactions")
     .select(
       `
       amount, type,
-      creator:created_by(email, full_name)
+      created_by (
+        email, full_name
+      )
     `,
     )
     .eq("id", transactionId)
     .single();
 
+  const tx = rawTx as unknown as TransactionWithCreator;
+
   // 3. Send Notification
-  if (tx && tx.creator) {
+  if (tx && tx.created_by) {
     import("@/lib/notifications").then(
       ({ sendTransactionStatusUpdateEmail }) => {
-        // @ts-expect-error
-        const email = tx.creator.email;
-        // @ts-expect-error
-        const name = tx.creator.full_name || "Officer";
+        const email = tx.created_by?.email;
+        const name = tx.created_by?.full_name || "Officer";
 
         if (email) {
           sendTransactionStatusUpdateEmail(
@@ -190,25 +203,27 @@ export async function rejectTransaction(transactionId: string) {
   if (error) return { success: false, message: "Rejection failed" };
 
   // 2. Fetch details for notification
-  const { data: tx } = await supabase
+  const { data: rawTx } = await supabase
     .from("transactions")
     .select(
       `
       amount, type,
-      creator:created_by(email, full_name)
+      created_by (
+        email, full_name
+      )
     `,
     )
     .eq("id", transactionId)
     .single();
 
+  const tx = rawTx as unknown as TransactionWithCreator;
+
   // 3. Send Notification
-  if (tx && tx.creator) {
+  if (tx && tx.created_by) {
     import("@/lib/notifications").then(
       ({ sendTransactionStatusUpdateEmail }) => {
-        // @ts-expect-error
-        const email = tx.creator.email;
-        // @ts-expect-error
-        const name = tx.creator.full_name || "Officer";
+        const email = tx.created_by?.email;
+        const name = tx.created_by?.full_name || "Officer";
 
         if (email) {
           sendTransactionStatusUpdateEmail(

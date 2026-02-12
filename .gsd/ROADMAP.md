@@ -55,9 +55,13 @@
 - Interactive Charts (Recharts)
 - Resident Finance Summary (Personal View)
 
-- Multi-language
-- SLA tracking for complaints
-- File evidence validation + stronger workflows
+### Phase 7 — Gap Closure (Tech Debt)
+
+**Status**: ✅ Complete
+
+- [x] Fix TypeScript errors in Server Actions (join types)
+- [x] Externalize Email Configuration (Env Vars)
+- [ ] Standardize Loading/Error states in Forms (Deferred)
 
 ## Milestone 3 — Enterprise Add-ons
 
